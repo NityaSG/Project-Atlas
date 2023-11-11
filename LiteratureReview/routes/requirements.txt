@@ -1,7 +1,7 @@
-python-3.8.8
 flask
 requests
 numpy
 pandas
 tensorflow
 gunicorn
+pickle5

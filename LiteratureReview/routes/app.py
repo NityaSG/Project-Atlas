@@ -7,12 +7,18 @@ import time
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-import pickle
+# import pickle
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+from keras.preprocessing.text import tokenizer_from_json
+
+with open('tokenizer.json') as f:
+    data = f.read()
+    tokenizer = tokenizer_from_json(data)
+
 # Load the tokenizer
-with open('tokenizer.pickle', 'rb') as handle:
-    tokenizer = pickle.load(handle)
+# with open('tokenizer.pickle', 'rb') as handle:
+#     tokenizer = pickle.load(handle)
 
 max_len = 700 
 trunc_type = 'post'
