@@ -3,4 +3,3 @@ requests
 numpy
 pandas
 tensorflow
-pickle
