@@ -77,7 +77,7 @@ def fetch_articles():
 
     # Create response
     output_bytes.seek(0)
-    return send_file(output_bytes, mimetype='text/csv', as_attachment=True, download_filename='articles.csv')
+    return send_file(output_bytes, mimetype='text/csv', as_attachment=True, attachment_filename='articles.csv')
 
 @app.route('/',methods=['GET'])
 def initialise():
