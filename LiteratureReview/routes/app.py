@@ -79,6 +79,10 @@ def fetch_articles():
     output_bytes.seek(0)
     return send_file(output_bytes, mimetype='text/csv', as_attachment=True, download_filename='articles.csv')
 
+@app.route('/',methods=['GET'])
+def initialise():
+    return "server is alive"
+
 @app.route('/fetch_process', methods=['POST'])
 def fetch_process():
     model = tf.keras.models.load_model('ANN')
