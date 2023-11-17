@@ -113,8 +113,13 @@ def fetch_process():
         article_tree = ElementTree.fromstring(fetch_response.content)
 
         for article in article_tree.findall(".//PubmedArticle"):
-            title = article.find(".//ArticleTitle").text
-            abstract = article.find(".//AbstractText").text
+            try:
+                title = article.find(".//ArticleTitle").text
+                abstract = article.find(".//AbstractText").text
+            except:
+                continue
+            if title is None or abstract is None:
+                continue
             try:
                 prediction=predict_safety([abstract])
             except:
