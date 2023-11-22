@@ -156,9 +156,12 @@ def fetch_process():
                 continue
             try:
                 prediction=predict_safety([abstract])
-                remark=generate_response([abstract])
             except:
                 prediction='NA'
+            try:
+                remark=generate_response([abstract])
+            except:
+                remark=""
             articles.append({
                 'name': title,
                 'reference_number': id,
