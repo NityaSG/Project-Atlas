@@ -2,6 +2,8 @@ from flask import Flask, request, send_file
 import requests
 from xml.etree import ElementTree
 import csv
+import os
+import openai
 import io
 import time
 import numpy as np
@@ -26,6 +28,37 @@ padding_type = 'post'
 oov_tok = '<OOV>' # out of vocabulary token
 vocab_size = 3000
 
+import openai
+
+def generate_response(input_text):
+    # Set your OpenAI API key
+    openai.api_key =os.getenv('OPENAI_API_KEY')
+
+    # Define your fixed prompt
+    prompt = f"""As an AI assistant in pharmaceutical literature review, your primary task is to identify Adverse Drug Reactions (ADRs) 
+in research abstracts. Focus on detecting mentions of 'adverse drug reaction', 'drug overdose', 'side effects', 
+'medication error', 'death', 'drug efficacy', 'drug withdrawal', 'drug interactions', 'carcinogenicity', 'teratogenicity', 
+'congenital disorder', 'drug contraindication', 'poisoning', 'substance-related disorders', 'drug resistance', 'treatment failure', 
+'drug abuse', 'pregnancy complications', 'mutagenicity', and various forms of toxicity like 'neurotox', 'immunotox', 'cardiotox', 'hepatotox', 
+'immunocytotox', and 'intoxication'. Analyze the abstracts for these specific terms and provide a detailed report on any identified ADRs.
+Criteria:
+- Identifiable patient
+- Suspected adverse reaction
+- Suspected medicinal product
+Output: Comprehensive analysis based on the above criteria.
+Note: Focus on clarity and accuracy in your assessment. {input_text}"""
+
+    # Use OpenAI's GPT-3 model to generate a response
+    response = openai.Completion.create(
+      engine="text-davinci-002",
+      prompt=prompt,
+      max_tokens=100
+    )
+
+    # Get the generated text
+    generated_text = response.choices[0].text.strip()
+
+    return generated_text
 
 
 app = Flask(__name__)
@@ -116,25 +149,28 @@ def fetch_process():
             try:
                 title = article.find(".//ArticleTitle").text
                 abstract = article.find(".//AbstractText").text
+                authors = ', '.join([author.find(".//LastName").text + ' ' + author.find(".//ForeName").text for author in article.findall(".//Author")])
             except:
                 continue
-            if title is None or abstract is None:
+            if title is None or abstract is None or authors is None:
                 continue
             try:
                 prediction=predict_safety([abstract])
+                remark=generate_response([abstract])
             except:
                 prediction='NA'
             articles.append({
                 'name': title,
                 'reference_number': id,
+                'authors': authors,
                 'abstract': abstract,
-                'prediction': prediction
+                'prediction': prediction,
+                'remark':remark
             })
-        time.sleep(1)
 
     # Create CSV in memory
     output = io.StringIO()
-    writer = csv.DictWriter(output, fieldnames=['name', 'reference_number', 'abstract', 'prediction'])
+    writer = csv.DictWriter(output, fieldnames=['name', 'reference_number', 'authors', 'abstract', 'prediction','remark'])
     writer.writeheader()
     writer.writerows(articles)
 
