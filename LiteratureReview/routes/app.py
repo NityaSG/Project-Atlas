@@ -162,6 +162,7 @@ def fetch_process():
                 remark=generate_response([abstract])
             except:
                 remark=""
+            remark=generate_response([abstract])
             articles.append({
                 'name': title,
                 'reference_number': id,
