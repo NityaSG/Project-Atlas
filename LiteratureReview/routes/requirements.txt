@@ -6,3 +6,4 @@ tensorflow
 gunicorn
 pickle5
 openai
+python-dotenv
