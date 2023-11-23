@@ -1,0 +1,14 @@
+{
+    "builds": [
+        {
+            "src": "LiteratureReview/routes/app.py",
+            "use": "@vercel/python"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "LiteratureReview/routes/app.py"
+        }
+    ]
+}
