@@ -9,18 +9,16 @@ import time
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+from dotenv import load_dotenv
 # import pickle
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from keras.preprocessing.text import tokenizer_from_json
-
+load_dotenv()
 with open('tokenizer.json') as f:
     data = f.read()
     tokenizer = tokenizer_from_json(data)
 
-# Load the tokenizer
-# with open('tokenizer.pickle', 'rb') as handle:
-#     tokenizer = pickle.load(handle)
 
 max_len = 700 
 trunc_type = 'post'
@@ -29,6 +27,31 @@ oov_tok = '<OOV>' # out of vocabulary token
 vocab_size = 3000
 
 import openai
+
+from openai import OpenAI
+client = OpenAI()
+#OpenAI.api_key = os.getenv('OPENAI_API_KEY')
+def genres(input_text):
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        temperature=0.1,
+        messages=[
+        {"role": "system", "content": """As an AI assistant in pharmaceutical literature review, your primary task is to identify Adverse Drug Reactions (ADRs) 
+        in research abstracts. Focus on detecting mentions of 'adverse drug reaction', 'drug overdose', 'side effects', 
+        'medication error', 'death', 'drug efficacy', 'drug withdrawal', 'drug interactions', 'carcinogenicity', 'teratogenicity', 
+    'congenital disorder', 'drug contraindication', 'poisoning', 'substance-related disorders', 'drug resistance', 'treatment failure', 
+    'drug abuse', 'pregnancy complications', 'mutagenicity', and various forms of toxicity like 'neurotox', 'immunotox', 'cardiotox', 'hepatotox', 
+    'immunocytotox', and 'intoxication'. Analyze the abstracts for these specific terms and provide a detailed report on any identified ADRs.
+        Criteria:
+        - Identifiable patient
+        - Suspected adverse reaction
+        - Suspected medicinal product
+Output: Comprehensive analysis based on the above criteria.
+Note: Focus on clarity and accuracy in your assessment.."""},
+        {"role": "user", "content": str(input_text)}
+    ]
+    )
+    return response.choices[0].message.content
 
 def generate_response(input_text):
     # Set your OpenAI API key
@@ -158,11 +181,11 @@ def fetch_process():
                 prediction=predict_safety([abstract])
             except:
                 prediction='NA'
-            try:
-                remark=generate_response([abstract])
-            except:
-                remark=""
-            remark=generate_response([abstract])
+            # try:
+            #     remark=generate_response([abstract])
+            # except:
+            #     remark=""
+            remark=genres([abstract])
             articles.append({
                 'name': title,
                 'reference_number': id,
