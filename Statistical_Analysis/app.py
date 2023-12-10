@@ -40,7 +40,7 @@ def process(df,target,treshold):
 
 def main():
     st.title('Atlas Statistical Analysis')
-    st.image('bg.png')
+    st.image('bg.jpeg')
     c1,c2=st.columns(2)
     target=c1.text_input("Enter the target column name")
     treshold=c1.number_input("Enter the treshold value")
