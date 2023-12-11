@@ -33,7 +33,8 @@ def process(df,target,treshold):
 
         print(f"95% CI Lower Bound: {lower_bound}")
         print(f"95% CI Upper Bound: {upper_bound}")
-        result=result.append({'Drug':target,'Event':event_term,'a':a,'b':b,'c':c,'d':d,'ROR':ROR,'Upper Bound':upper_bound,'Lower Bound':lower_bound},ignore_index=True)
+        new_row = {'Drug':target,'Event':event_term,'a':a,'b':b,'c':c,'d':d,'ROR':ROR,'Upper Bound':upper_bound,'Lower Bound':lower_bound}
+        result=pd.concat(result,pd.DataFrame([new_row]),ignore_index=True)
     return result
 
 
