@@ -5,7 +5,7 @@ import io
 from datetime import datetime, timedelta
 
 # Define the URL of the API endpoint
-api_url = "https://atlas-9seq.onrender.com/fetch_process"
+api_url = "https://atlas-web-thjf.onrender.com/fetch_process"
 st.title('Project ATLAS')
 st.caption("ThinkRoman Ventures")
 #st.warning("Only for testing purpose. Not in production")
