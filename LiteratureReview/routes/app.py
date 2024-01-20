@@ -20,7 +20,7 @@ with open('tokenizer.json') as f:
     data = f.read()
     tokenizer = tokenizer_from_json(data)
 
-
+model = tf.keras.models.load_model('ANN')
 max_len = 700 
 trunc_type = 'post'
 padding_type = 'post'
@@ -142,7 +142,7 @@ def initialise():
 
 @app.route('/fetch_process', methods=['POST'])
 def fetch_process():
-    model = tf.keras.models.load_model('ANN')
+    
     def predict_safety(predict_msg):
         new_seq = tokenizer.texts_to_sequences(predict_msg)
         padded = pad_sequences(new_seq,maxlen = max_len,padding = padding_type,truncating = trunc_type)
@@ -210,6 +210,56 @@ def fetch_process():
 
     # Stream response
     return Response(generate(), mimetype='text/csv', headers={'Content-Disposition': 'attachment;filename=articles.csv'})
+
+@app.route('/upload_csv', methods=['POST'])
+def upload_csv():
+    def predict_safety(predict_msg):
+        new_seq = tokenizer.texts_to_sequences(predict_msg)
+        padded = pad_sequences(new_seq, maxlen=max_len, padding=padding_type, truncating=trunc_type)
+        return model.predict(padded)
+
+    if 'file' not in request.files:
+        return "No file part", 400
+    file = request.files['file']
+    if file.filename == '':
+        return "No selected file", 400
+    if file:
+        df = pd.read_csv(file)
+        
+        # Process each row in the DataFrame
+        articles = []
+        for _, row in df.iterrows():
+            try:
+                title = row.get('title', 'No Title')
+                abstract = row.get('abstract', 'No Abstract')
+                authors = row.get('authors', 'No Authors')
+                prediction = predict_safety([abstract])
+                remark=genres([abstract])  # Add your remark logic
+                articles.append({
+                    'name': title,
+                    'authors': authors,
+                    'abstract': abstract,
+                    'prediction': prediction,
+                    'remark': remark
+                })
+            except Exception as e:
+                print(f"Error processing row: {e}")
+
+        # Create CSV in memory
+        def generate():
+            output = io.StringIO()
+            writer = csv.DictWriter(output, fieldnames=['name', 'authors', 'abstract', 'prediction', 'remark'])
+            writer.writeheader()
+            for article in articles:
+                writer.writerow(article)
+                yield output.getvalue()
+                output.seek(0)
+                output.truncate(0)
+
+        # Stream response
+        return Response(generate(), mimetype='text/csv', headers={'Content-Disposition': 'attachment;filename=processed_articles.csv'})
+
+    return "Unexpected error", 500
 
 @app.route('/fetch_proc', methods=['POST'])
 def fetch_proc():
