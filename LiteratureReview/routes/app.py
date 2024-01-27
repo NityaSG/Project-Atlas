@@ -333,7 +333,7 @@ def fetch_proc():
 
 
 @app.route('/fetch_stream', methods=['POST'])
-def fetch_process():
+def fetch_proces():
     model = tf.keras.models.load_model('ANN')
     def predict_safety(predict_msg):
         new_seq = tokenizer.texts_to_sequences(predict_msg)
