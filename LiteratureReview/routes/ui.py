@@ -5,7 +5,7 @@ import io
 from datetime import datetime, timedelta
 
 # Define the URLs of the API endpoints
-fetch_api_url = "https://atlas-web-thjf.onrender.com/fetch_process"
+fetch_api_url = "http://localhost:5000/fetch_process"
 upload_api_url = "https://atlas-web-thjf.onrender.com/upload_csv"
 
 st.title('Project ATLAS')
